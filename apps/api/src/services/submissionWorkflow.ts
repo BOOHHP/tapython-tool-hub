@@ -494,7 +494,7 @@ function readZipEntries(buffer: Buffer): Map<string, ZipEntryContent> {
     const extraLength = buffer.readUInt16LE(offset + 30);
     const commentLength = buffer.readUInt16LE(offset + 32);
     const localHeaderOffset = buffer.readUInt32LE(offset + 42);
-    const fileName = buffer.subarray(offset + 46, offset + 46 + fileNameLength).toString('utf8');
+    const fileName = normalizeZipEntryPath(buffer.subarray(offset + 46, offset + 46 + fileNameLength).toString('utf8'));
 
     if (!fileName.endsWith('/')) {
       entries.set(fileName, {
@@ -528,6 +528,10 @@ function readLocalEntryContent(buffer: Buffer, localHeaderOffset: number, compre
   }
 
   throw new Error(`Unsupported ZIP compression method ${compressionMethod}`);
+}
+
+function normalizeZipEntryPath(entryName: string): string {
+  return entryName.replace(/\\/g, '/');
 }
 
 function findEndOfCentralDirectory(buffer: Buffer): number {
