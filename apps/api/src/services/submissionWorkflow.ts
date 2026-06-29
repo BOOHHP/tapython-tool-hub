@@ -277,6 +277,10 @@ function buildSubmissionRequestFromPackage(parsedPackage: ParsedToolPackage, sub
     path: 'MenuConfig.snippet.json',
     content: `${JSON.stringify(manifest.menuEntries, null, 2)}\n`
   });
+  assets.push({
+    path: 'assets/MenuConfig.snippet.json',
+    content: `${JSON.stringify(manifest.menuEntries, null, 2)}\n`
+  });
 
   return {
     slug: manifest.slug,
@@ -354,7 +358,7 @@ function buildMarkdownFromPackageManifest(manifest: TapythonToolPackageManifest)
     '## MenuConfig',
     '',
     '```json menuconfig path=MenuConfig.snippet.json',
-    '@file:MenuConfig.snippet.json',
+    '@file:assets/MenuConfig.snippet.json',
     '```',
     '',
     ...manifest.files.flatMap((file) => buildMarkdownFileReference(file.path)),
