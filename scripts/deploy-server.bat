@@ -6,7 +6,7 @@ for %%I in ("%SCRIPT_DIR%..") do set "REPO_ROOT=%%~fI"
 cd /d "%REPO_ROOT%"
 
 set "REMOTE_NAME=%~1"
-if "%REMOTE_NAME%"=="" set "REMOTE_NAME=radial-fork"
+if "%REMOTE_NAME%"=="" set "REMOTE_NAME=origin"
 
 set "REMOTE_BRANCH=%~2"
 if "%REMOTE_BRANCH%"=="" set "REMOTE_BRANCH=master"
