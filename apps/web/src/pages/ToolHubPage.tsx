@@ -9,6 +9,7 @@ import {
   DiffOutlined,
   FileProtectOutlined,
   FileSearchOutlined,
+  GithubOutlined,
   RobotOutlined,
   SafetyCertificateOutlined,
   SettingOutlined,
@@ -61,6 +62,8 @@ type InstallMode = 'ai' | 'cli' | 'zip';
 type CliPlatform = 'posix' | 'windows' | 'download';
 
 const FAVORITES_STORAGE_KEY = 'tapython-tool-hub:favorites';
+// GitHub "latest/download" 直链始终指向最新发行版中的同名资产
+const INSTALLER_DOWNLOAD_URL = 'https://github.com/BOOHHP/TAPython_installer/releases/latest/download/TAPythonInstaller.exe';
 
 function readInitialViewMode(): ViewMode {
   if (typeof window === 'undefined') return 'tools';
@@ -323,6 +326,7 @@ function RegistryHero({ tools, loading, onBrowse, onSubmit, onAdmin }: { tools: 
           <Button type="primary" icon={<AppstoreOutlined />} onClick={onBrowse}>浏览工具库</Button>
           <Button icon={<UploadOutlined />} onClick={onSubmit}>提交或发布工具</Button>
           <Button icon={<SettingOutlined />} onClick={onAdmin}>后台管理</Button>
+          <Button icon={<GithubOutlined />} href={INSTALLER_DOWNLOAD_URL}>下载 TAPython Installer</Button>
         </Space>
       </div>
       <div className="registry-hero-panel" aria-label="Registry health summary">
