@@ -44,6 +44,10 @@ export const tapythonToolPackageSummarySchema = z.object({
   riskNotes: z.array(z.string())
 });
 
+const tapythonToolPackageMenuConfigItemSchema = menuConfigItemSchema.extend({
+  ExtensionHookName: z.string().optional()
+}).passthrough();
+
 export const tapythonToolPackageManifestSchema = z.object({
   formatVersion: z.literal(2),
   packageType: z.literal('TAPythonToolPackage'),
@@ -63,7 +67,7 @@ export const tapythonToolPackageManifestSchema = z.object({
   dependencies: z.array(z.string()),
   install: tapythonToolPackageInstallSchema,
   files: z.array(tapythonToolPackageFileSchema),
-  menuEntries: z.array(menuConfigItemSchema),
+  menuEntries: z.array(tapythonToolPackageMenuConfigItemSchema),
   hotkeyEntries: z.record(z.unknown()),
   externalJson: z.array(z.string()),
   summary: tapythonToolPackageSummarySchema,
@@ -72,7 +76,13 @@ export const tapythonToolPackageManifestSchema = z.object({
   uninstallSteps: z.array(z.string()),
   createdAt: z.string(),
   updatedAt: z.string()
-});
+}).transform((manifest) => ({
+  ...manifest,
+  menuEntries: manifest.menuEntries.map((entry) => ({
+    ...entry,
+    ExtensionHookName: entry.ExtensionHookName ?? manifest.install.mountPoint
+  }))
+}));
 
 export const toolManifestSchema = z.object({
   schemaVersion: z.string(),

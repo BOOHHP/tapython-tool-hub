@@ -148,6 +148,32 @@ test('accepts ToolHub generated v2 packages as package submissions', async () =>
   }
 });
 
+test('uses the package mount point when a v2 menu entry omits ExtensionHookName', async () => {
+  const sourceContext = await createContext();
+  const targetContext = await createContext();
+  try {
+    const slug = 'legacy-menu-entry-tool';
+    const sourceSubmission = await sourceContext.workflow.createSubmission(validSubmissionWithAssets(slug, '1.0.0'));
+    await sourceContext.workflow.reviewSubmission(sourceSubmission.id, {
+      reviewer: 'TA Reviewer',
+      decision: 'approved'
+    });
+
+    const generatedPackage = await fs.readFile(path.join(sourceContext.config.downloadRoot, slug, '1.0.0', `${slug}-1.0.0.zip`));
+    const packageBuffer = removeExtensionHookName(generatedPackage);
+    const packageSubmission = await targetContext.workflow.createPackageSubmission({
+      packageBuffer,
+      submitter: 'QA Team'
+    });
+
+    assert.equal(packageSubmission.status, 'pending');
+    assert.match(packageSubmission.markdown, /ExtensionHookName: OnToolBarChameleon/);
+  } finally {
+    await sourceContext.cleanup();
+    await targetContext.cleanup();
+  }
+});
+
 test('records rejected reviews without publishing artifacts', async () => {
   const context = await createContext();
   try {
@@ -313,6 +339,18 @@ function validSubmissionWithAssets(slug: string, version: string): ToolSubmissio
       ''
     ].join('\n')
   };
+}
+
+function removeExtensionHookName(packageBuffer: Buffer): Buffer {
+  const original = Buffer.from('"ExtensionHookName": "OnToolBarChameleon"', 'utf8');
+  const replacement = Buffer.from('"ignored"          : "OnToolBarChameleon"', 'utf8');
+  assert.equal(replacement.length, original.length);
+
+  const result = Buffer.from(packageBuffer);
+  const offset = result.indexOf(original);
+  assert.notEqual(offset, -1);
+  replacement.copy(result, offset);
+  return result;
 }
 
 function toPascalCase(value: string): string {
